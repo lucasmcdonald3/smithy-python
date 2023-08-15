@@ -26,9 +26,20 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  */
 @SmithyUnstableApi
 public final class PythonClientCodegenPlugin implements SmithyBuildPlugin {
+    private boolean shouldPerformDefaultCodegenTransforms = true;
+    private boolean shouldCreateDedicatedInputsAndOutputs = true;
+
     @Override
     public String getName() {
         return "python-client-codegen";
+    }
+
+    public void disablePerformDefaultCodegenTransforms() {
+        shouldPerformDefaultCodegenTransforms = false;
+    }
+
+    public void disableCreateDedicatedInputsAndOutputs() {
+        shouldCreateDedicatedInputsAndOutputs = false;
     }
 
     @Override
@@ -43,8 +54,12 @@ public final class PythonClientCodegenPlugin implements SmithyBuildPlugin {
         runner.service(settings.getService());
         runner.model(context.getModel());
         runner.integrationClass(PythonIntegration.class);
-        runner.performDefaultCodegenTransforms();
-        runner.createDedicatedInputsAndOutputs();
+        if (shouldPerformDefaultCodegenTransforms) {
+            runner.performDefaultCodegenTransforms();
+        }
+        if (shouldCreateDedicatedInputsAndOutputs) {
+            runner.createDedicatedInputsAndOutputs();
+        }
         runner.run();
     }
 }
