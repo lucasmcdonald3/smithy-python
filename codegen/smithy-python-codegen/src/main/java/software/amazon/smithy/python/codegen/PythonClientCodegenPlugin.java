@@ -46,20 +46,20 @@ public final class PythonClientCodegenPlugin implements SmithyBuildPlugin {
     public void execute(PluginContext context) {
         CodegenDirector<PythonWriter, PythonIntegration, GenerationContext, PythonSettings> runner
                 = new CodegenDirector<>();
-
-        PythonSettings settings = PythonSettings.from(context.getSettings());
-        runner.settings(settings);
-        runner.directedCodegen(new DirectedPythonCodegen());
-        runner.fileManifest(context.getFileManifest());
-        runner.service(settings.getService());
-        runner.model(context.getModel());
-        runner.integrationClass(PythonIntegration.class);
-        if (shouldPerformDefaultCodegenTransforms) {
-            runner.performDefaultCodegenTransforms();
-        }
-        if (shouldCreateDedicatedInputsAndOutputs) {
-            runner.createDedicatedInputsAndOutputs();
-        }
-        runner.run();
+//
+//        PythonSettings settings = PythonSettings.from(context.getSettings());
+//        runner.settings(settings);
+//        runner.directedCodegen(new DirectedPythonCodegen());
+//        runner.fileManifest(context.getFileManifest());
+//        runner.service(settings.getService());
+//        runner.model(context.getModel());
+//        runner.integrationClass(PythonIntegration.class);
+//        if (shouldPerformDefaultCodegenTransforms) {
+//            runner.performDefaultCodegenTransforms();
+//        }
+//        if (shouldCreateDedicatedInputsAndOutputs) {
+//            runner.createDedicatedInputsAndOutputs();
+//        }
+//        runner.run();
     }
 }

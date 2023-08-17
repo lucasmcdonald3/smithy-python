@@ -236,16 +236,16 @@ final class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
     private Symbol createAsDictFunctionSymbol(Shape shape) {
         return Symbol.builder()
                 .name(String.format("_%s_as_dict", CaseUtils.toSnakeCase(shape.getId().getName())))
-                .namespace(format("%s.models", settings.getModuleName()), ".")
-                .definitionFile(format("./%s/models.py", settings.getModuleName()))
+                .namespace(format("%s.modelo", settings.getModuleName()), ".")
+                .definitionFile(format("./%s/modelo.py", settings.getModuleName()))
                 .build();
     }
 
     private Symbol createFromDictFunctionSymbol(Shape shape) {
         return Symbol.builder()
                 .name(String.format("_%s_from_dict", CaseUtils.toSnakeCase(shape.getId().getName())))
-                .namespace(format("%s.models", settings.getModuleName()), ".")
-                .definitionFile(format("./%s/models.py", settings.getModuleName()))
+                .namespace(format("%s.modelo", settings.getModuleName()), ".")
+                .definitionFile(format("./%s/modelo.py", settings.getModuleName()))
                 .build();
     }
 
@@ -344,8 +344,8 @@ final class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
     public Symbol enumShape(EnumShape shape) {
         var builder = createSymbolBuilder(shape, "str");
         String name = getDefaultShapeName(shape);
-        Symbol enumSymbol = createSymbolBuilder(shape, name, format("%s.models", settings.getModuleName()))
-                .definitionFile(format("./%s/models.py", settings.getModuleName()))
+        Symbol enumSymbol = createSymbolBuilder(shape, name, format("%s.modelo", settings.getModuleName()))
+                .definitionFile(format("./%s/modelo.py", settings.getModuleName()))
                 .build();
 
         // We add this enum symbol as a property on a generic string symbol
@@ -361,8 +361,8 @@ final class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
     public Symbol intEnumShape(IntEnumShape shape) {
         var builder = createSymbolBuilder(shape, "int");
         String name = getDefaultShapeName(shape);
-        Symbol enumSymbol = createSymbolBuilder(shape, name, format("%s.models", settings.getModuleName()))
-                .definitionFile(format("./%s/models.py", settings.getModuleName()))
+        Symbol enumSymbol = createSymbolBuilder(shape, name, format("%s.modelo", settings.getModuleName()))
+                .definitionFile(format("./%s/modelo.py", settings.getModuleName()))
                 .build();
 
         // Like string enums, int enums are plain ints when used as members.
@@ -378,8 +378,8 @@ final class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
                     .definitionFile(format("./%s/errors.py", settings.getModuleName()))
                     .build();
         }
-        return createSymbolBuilder(shape, name, format("%s.models", settings.getModuleName()))
-                .definitionFile(format("./%s/models.py", settings.getModuleName()))
+        return createSymbolBuilder(shape, name, format("%s.modelo", settings.getModuleName()))
+                .definitionFile(format("./%s/modelo.py", settings.getModuleName()))
                 .build();
     }
 
@@ -388,12 +388,12 @@ final class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
         String name = getDefaultShapeName(shape);
 
         var unknownName = name + "Unknown";
-        var unknownSymbol = createSymbolBuilder(shape, unknownName, format("%s.models", settings.getModuleName()))
-            .definitionFile(format("./%s/models.py", settings.getModuleName()))
+        var unknownSymbol = createSymbolBuilder(shape, unknownName, format("%s.modelo", settings.getModuleName()))
+            .definitionFile(format("./%s/modelo.py", settings.getModuleName()))
             .build();
 
-        return createSymbolBuilder(shape, name, format("%s.models", settings.getModuleName()))
-                .definitionFile(format("./%s/models.py", settings.getModuleName()))
+        return createSymbolBuilder(shape, name, format("%s.modelo", settings.getModuleName()))
+                .definitionFile(format("./%s/modelo.py", settings.getModuleName()))
                 .putProperty("fromDict", createFromDictFunctionSymbol(shape))
                 .putProperty("unknown", unknownSymbol)
                 .build();
@@ -406,8 +406,8 @@ final class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
             // Union members, unlike other shape members, have types generated for them.
             var containerSymbol = container.accept(this);
             var name = containerSymbol.getName() + StringUtils.capitalize(shape.getMemberName());
-            return createSymbolBuilder(shape, name, format("%s.models", settings.getModuleName()))
-                .definitionFile(format("./%s/models.py", settings.getModuleName()))
+            return createSymbolBuilder(shape, name, format("%s.modelo", settings.getModuleName()))
+                .definitionFile(format("./%s/modelo.py", settings.getModuleName()))
                 .build();
         }
         Shape targetShape = model.getShape(shape.getTarget())
