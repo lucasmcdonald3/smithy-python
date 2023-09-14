@@ -224,23 +224,19 @@ final class ConfigGenerator implements Runnable {
         writer.getImportContainer().addImport("smithy_python.interfaces.interceptor", "Interceptor", "Interceptor");
 
         writer.writeInline("_ServiceInterceptor = Union[");
-        if (operationShapes.isEmpty()) {
-            writer.writeInline("None]");
-        } else {
-            var iter = operationShapes.iterator();
-            while (iter.hasNext()) {
-                var operation = iter.next();
-                var input = symbolProvider.toSymbol(context.model().expectShape(operation.getInputShape()));
-                var output = symbolProvider.toSymbol(context.model().expectShape(operation.getOutputShape()));
+        var iter = operationShapes.iterator();
+        while (iter.hasNext()) {
+            var operation = iter.next();
+            var input = symbolProvider.toSymbol(context.model().expectShape(operation.getInputShape()));
+            var output = symbolProvider.toSymbol(context.model().expectShape(operation.getOutputShape()));
 
-                // TODO: pull the transport request/response types off of the application protocol
-                writer.addStdlibImport("typing", "Any");
-                writer.writeInline("Interceptor[$T, $T, Any, Any]", input, output);
-                if (iter.hasNext()) {
-                    writer.writeInline(", ");
-                } else {
-                    writer.writeInline("]");
-                }
+            // TODO: pull the transport request/response types off of the application protocol
+            writer.addStdlibImport("typing", "Any");
+            writer.writeInline("Interceptor[$T, $T, Any, Any]", input, output);
+            if (iter.hasNext()) {
+                writer.writeInline(", ");
+            } else {
+                writer.writeInline("]");
             }
         }
         writer.write("");

@@ -43,7 +43,7 @@ import software.amazon.smithy.model.traits.SensitiveTrait;
 /**
  * Renders structures.
  */
-public class StructureGenerator implements Runnable {
+final class StructureGenerator implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(StructureGenerator.class.getName());
 
@@ -56,7 +56,7 @@ public class StructureGenerator implements Runnable {
     private final Set<Shape> recursiveShapes;
     private final PythonSettings settings;
 
-    public StructureGenerator(
+    StructureGenerator(
             Model model,
             PythonSettings settings,
             SymbolProvider symbolProvider,

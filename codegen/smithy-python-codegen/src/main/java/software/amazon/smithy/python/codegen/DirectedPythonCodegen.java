@@ -56,7 +56,7 @@ import software.amazon.smithy.python.codegen.integration.PythonIntegration;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 
 @SmithyUnstableApi
-public class DirectedPythonCodegen implements DirectedCodegen<GenerationContext, PythonSettings, PythonIntegration> {
+final class DirectedPythonCodegen implements DirectedCodegen<GenerationContext, PythonSettings, PythonIntegration> {
 
     private static final Logger LOGGER = Logger.getLogger(DirectedPythonCodegen.class.getName());
 
