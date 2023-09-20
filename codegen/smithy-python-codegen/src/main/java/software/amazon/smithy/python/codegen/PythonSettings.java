@@ -31,7 +31,7 @@ import software.amazon.smithy.utils.SmithyUnstableApi;
  * TODO: make this immutable
  */
 @SmithyUnstableApi
-public final class PythonSettings {
+public class PythonSettings {
 
     private static final String SERVICE = "service";
     private static final String MODULE_NAME = "module";
