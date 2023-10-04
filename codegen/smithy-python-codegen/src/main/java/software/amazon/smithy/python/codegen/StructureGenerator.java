@@ -43,7 +43,7 @@ import software.amazon.smithy.model.traits.SensitiveTrait;
 /**
  * Renders structures.
  */
-public class StructureGenerator implements Runnable {
+public final class StructureGenerator implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(StructureGenerator.class.getName());
 
