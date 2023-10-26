@@ -68,7 +68,7 @@ import software.amazon.smithy.utils.StringUtils;
  * <p>Reserved words for Python are automatically escaped so that they are
  * suffixed with "_". See "reserved-words.txt" for the list of words.
  */
-final class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
+public final class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
 
     private static final Logger LOGGER = Logger.getLogger(SymbolVisitor.class.getName());
 
@@ -78,7 +78,7 @@ final class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
     private final PythonSettings settings;
     private final ServiceShape service;
 
-    SymbolVisitor(Model model, PythonSettings settings) {
+    public SymbolVisitor(Model model, PythonSettings settings) {
         this.model = model;
         this.settings = settings;
         this.service = model.expectShape(settings.getService(), ServiceShape.class);
