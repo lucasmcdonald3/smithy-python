@@ -29,6 +29,7 @@ import software.amazon.smithy.codegen.core.Symbol;
 import software.amazon.smithy.codegen.core.SymbolProvider;
 import software.amazon.smithy.model.Model;
 import software.amazon.smithy.model.knowledge.NullableIndex;
+import software.amazon.smithy.model.knowledge.NullableIndex.CheckMode;
 import software.amazon.smithy.model.node.Node;
 import software.amazon.smithy.model.shapes.MemberShape;
 import software.amazon.smithy.model.shapes.Shape;
@@ -43,18 +44,18 @@ import software.amazon.smithy.model.traits.SensitiveTrait;
 /**
  * Renders structures.
  */
-public final class StructureGenerator implements Runnable {
+public class StructureGenerator implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(StructureGenerator.class.getName());
 
-    private final Model model;
-    private final SymbolProvider symbolProvider;
-    private final PythonWriter writer;
-    private final StructureShape shape;
-    private final List<MemberShape> requiredMembers;
-    private final List<MemberShape> optionalMembers;
-    private final Set<Shape> recursiveShapes;
-    private final PythonSettings settings;
+    protected final Model model;
+    protected final SymbolProvider symbolProvider;
+    protected final PythonWriter writer;
+    protected final StructureShape shape;
+    protected final List<MemberShape> requiredMembers;
+    protected final List<MemberShape> optionalMembers;
+    protected final Set<Shape> recursiveShapes;
+    protected final PythonSettings settings;
 
     public StructureGenerator(
             Model model,
@@ -96,7 +97,7 @@ public final class StructureGenerator implements Runnable {
     /**
      * Renders a normal, non-error structure.
      */
-    private void renderStructure() {
+    protected void renderStructure() {
         writer.addStdlibImport("typing", "Dict");
         writer.addStdlibImport("typing", "Any");
         var symbol = symbolProvider.toSymbol(shape);
@@ -111,7 +112,7 @@ public final class StructureGenerator implements Runnable {
         writer.write("");
     }
 
-    private void renderError() {
+    protected void renderError() {
         writer.addStdlibImport("typing", "Dict");
         writer.addStdlibImport("typing", "Any");
         writer.addStdlibImport("typing", "Literal");
@@ -132,31 +133,35 @@ public final class StructureGenerator implements Runnable {
         writer.write("");
     }
 
-    private void writeProperties(boolean isError) {
-        NullableIndex index = NullableIndex.of(model);
+    protected void writeProperties(boolean isError) {
         for (MemberShape member : shape.members()) {
-            if (isError && isErrorMessage(model, member)) {
-                continue;
-            }
-            var memberName = symbolProvider.toMemberName(member);
-            if (index.isMemberNullable(member)) {
-                writer.addStdlibImport("typing", "Optional");
-                String formatString = format("$L: Optional[%s]", getTargetFormat(member));
-                writer.write(formatString, memberName, symbolProvider.toSymbol(member));
-            } else {
-                String formatString = format("$L: %s", getTargetFormat(member));
-                writer.write(formatString, memberName, symbolProvider.toSymbol(member));
-            }
+            writePropertyForMember(isError, member);
         }
     }
 
-    private void writeInit(boolean isError) {
+    protected void writePropertyForMember(boolean isError, MemberShape member) {
+        NullableIndex index = NullableIndex.of(model);
+
+        if (isError && isErrorMessage(model, member)) {
+            return;
+        }
+        var memberName = symbolProvider.toMemberName(member);
+        if (index.isMemberNullable(member)) {
+            writer.addStdlibImport("typing", "Optional");
+            String formatString = format("$L: Optional[%s]", getTargetFormat(member));
+            writer.write(formatString, memberName, symbolProvider.toSymbol(member));
+        } else {
+            String formatString = format("$L: %s", getTargetFormat(member));
+            writer.write(formatString, memberName, symbolProvider.toSymbol(member));
+        }
+    }
+
+    protected void writeInit(boolean isError) {
         if (!isError && shape.members().isEmpty()) {
             writeClassDocs(false);
             return;
         }
 
-        var nullableIndex = NullableIndex.of(model);
         writer.openBlock("def __init__(", "):", () -> {
             writer.write("self,");
             if (!shape.members().isEmpty() || isError) {
@@ -167,37 +172,10 @@ public final class StructureGenerator implements Runnable {
                 writer.write("message: str,");
             }
             for (MemberShape member : requiredMembers) {
-                var memberName = symbolProvider.toMemberName(member);
-                String formatString = format("$L: %s,", getTargetFormat(member));
-                writer.write(formatString, memberName, symbolProvider.toSymbol(member));
+                writeInitMethodParameterForRequiredMember(isError, member);
             }
             for (MemberShape member : optionalMembers) {
-                var memberName = symbolProvider.toMemberName(member);
-                if (nullableIndex.isMemberNullable(member)) {
-                    writer.addStdlibImport("typing", "Optional");
-                    String formatString = format("$L: Optional[%s] = None,", getTargetFormat(member));
-                    writer.write(formatString, memberName, symbolProvider.toSymbol(member));
-                } else if (member.hasTrait(RequiredTrait.class)) {
-                    String formatString = format("$L: %s = $L,", getTargetFormat(member));
-                    writer.write(formatString, memberName, symbolProvider.toSymbol(member),
-                            getDefaultValue(writer, member));
-                } else {
-                    // Shapes that are simple types, lists, or maps can have default values.
-                    // https://smithy.io/2.0/spec/type-refinement-traits.html#smithy-api-default-trait
-                    var target = model.expectShape(member.getTarget());
-                    var memberSymbol = symbolProvider.toSymbol(member);
-                    String formatString;
-                    if (target.isDocumentShape() || target.isListShape() || target.isMapShape()) {
-                        // Documents, lists, and maps can have mutable defaults so just use None in the
-                        // constructor.
-                        writer.addStdlibImport("typing", "Optional");
-                        formatString = format("$L: Optional[%1$s] = None,", getTargetFormat(member));
-                        writer.write(formatString, memberName, memberSymbol);
-                    } else {
-                        formatString = format("$L: %s = $L,", getTargetFormat(member));
-                        writer.write(formatString, memberName, memberSymbol, getDefaultValue(writer, member));
-                    }
-                }
+                writeInitMethodParameterForOptionalMember(isError, member);
             }
         });
 
@@ -220,6 +198,44 @@ public final class StructureGenerator implements Runnable {
         writer.dedent();
         writer.write("");
     }
+
+    protected void writeInitMethodParameterForRequiredMember(boolean isError, MemberShape member) {
+        var memberName = symbolProvider.toMemberName(member);
+        String formatString = format("$L: %s,", getTargetFormat(member));
+        writer.write(formatString, memberName, symbolProvider.toSymbol(member));
+    }
+
+    protected void writeInitMethodParameterForOptionalMember(boolean isError, MemberShape member) {
+        var memberName = symbolProvider.toMemberName(member);
+        var nullableIndex = NullableIndex.of(model);
+
+        if (nullableIndex.isMemberNullable(member)) {
+            writer.addStdlibImport("typing", "Optional");
+            String formatString = format("$L: Optional[%s] = None,", getTargetFormat(member));
+            writer.write(formatString, memberName, symbolProvider.toSymbol(member));
+        } else if (member.hasTrait(RequiredTrait.class)) {
+            String formatString = format("$L: %s = $L,", getTargetFormat(member));
+            writer.write(formatString, memberName, symbolProvider.toSymbol(member),
+                getDefaultValue(writer, member));
+        } else {
+            // Shapes that are simple types, lists, or maps can have default values.
+            // https://smithy.io/2.0/spec/type-refinement-traits.html#smithy-api-default-trait
+            var target = model.expectShape(member.getTarget());
+            var memberSymbol = symbolProvider.toSymbol(member);
+            String formatString;
+            if (target.isDocumentShape() || target.isListShape() || target.isMapShape()) {
+                // Documents, lists, and maps can have mutable defaults so just use None in the
+                // constructor.
+                writer.addStdlibImport("typing", "Optional");
+                formatString = format("$L: Optional[%1$s] = None,", getTargetFormat(member));
+                writer.write(formatString, memberName, memberSymbol);
+            } else {
+                formatString = format("$L: %s = $L,", getTargetFormat(member));
+                writer.write(formatString, memberName, memberSymbol, getDefaultValue(writer, member));
+            }
+        }
+    }
+
 
     private boolean isOptionalDefault(MemberShape member) {
         // If a member with a default value isn't required, it's optional.
