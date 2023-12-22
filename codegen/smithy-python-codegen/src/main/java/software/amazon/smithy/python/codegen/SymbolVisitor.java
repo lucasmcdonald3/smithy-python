@@ -234,7 +234,7 @@ public class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
         return true;
     }
 
-    private Symbol createAsDictFunctionSymbol(Shape shape) {
+    protected Symbol createAsDictFunctionSymbol(Shape shape) {
         return Symbol.builder()
                 .name(String.format("_%s_as_dict", CaseUtils.toSnakeCase(shape.getId().getName())))
                 .namespace(format("%s.models", settings.getModuleName()), ".")
@@ -242,7 +242,7 @@ public class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
                 .build();
     }
 
-    private Symbol createFromDictFunctionSymbol(Shape shape) {
+    protected Symbol createFromDictFunctionSymbol(Shape shape) {
         return Symbol.builder()
                 .name(String.format("_%s_from_dict", CaseUtils.toSnakeCase(shape.getId().getName())))
                 .namespace(format("%s.models", settings.getModuleName()), ".")

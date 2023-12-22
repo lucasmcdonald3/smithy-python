@@ -135,7 +135,7 @@ public class DirectedPythonCodegen implements DirectedCodegen<GenerationContext,
         protocolGenerator.generateProtocolTests(directive.context());
     }
 
-    private void generateServiceErrors(PythonSettings settings, WriterDelegator<PythonWriter> writers) {
+    protected void generateServiceErrors(PythonSettings settings, WriterDelegator<PythonWriter> writers) {
         var serviceError = CodegenUtils.getServiceError(settings);
         writers.useFileWriter(serviceError.getDefinitionFile(), serviceError.getNamespace(), writer -> {
             // TODO: subclass a shared error
@@ -283,6 +283,7 @@ public class DirectedPythonCodegen implements DirectedCodegen<GenerationContext,
      * Creates __init__.py files where not already present.
      */
     private void generateInits(CustomizeDirective<GenerationContext, PythonSettings> directive) {
+        System.out.println("inits" + directive.context().writerDelegator().getWriters().keySet());
         var directories = directive.context().writerDelegator().getWriters().keySet().stream()
                 .map(Paths::get)
                 .filter(path -> !path.getParent().equals(directive.fileManifest().getBaseDir()))

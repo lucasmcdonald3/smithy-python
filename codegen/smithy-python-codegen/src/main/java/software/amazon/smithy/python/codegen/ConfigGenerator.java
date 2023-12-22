@@ -31,7 +31,7 @@ import software.amazon.smithy.utils.CodeInterceptor;
 /**
  * Generates the client's config object.
  */
-final class ConfigGenerator implements Runnable {
+public class ConfigGenerator implements Runnable {
 
     // This list contains any properties that should unconditionally be added to every
     // config object. This should be as minimal as possible, and importantly should
@@ -129,10 +129,10 @@ final class ConfigGenerator implements Runnable {
             .build()
     );
 
-    private final PythonSettings settings;
-    private final GenerationContext context;
+    protected final PythonSettings settings;
+    protected final GenerationContext context;
 
-    ConfigGenerator(PythonSettings settings, GenerationContext context) {
+    protected ConfigGenerator(PythonSettings settings, GenerationContext context) {
         this.context = context;
         this.settings = settings;
     }
@@ -214,7 +214,7 @@ final class ConfigGenerator implements Runnable {
         });
     }
 
-    private void writeInterceptorsType(PythonWriter writer) {
+    protected void writeInterceptorsType(PythonWriter writer) {
         var symbolProvider = context.symbolProvider();
         var operationShapes = TopDownIndex.of(context.model())
                 .getContainedOperations(settings.getService());
@@ -246,7 +246,7 @@ final class ConfigGenerator implements Runnable {
         writer.write("");
     }
 
-    private void generateConfig(GenerationContext context, PythonWriter writer) {
+    protected void generateConfig(GenerationContext context, PythonWriter writer) {
         var symbol = CodegenUtils.getConfigSymbol(context.settings());
 
         // Initialize the list of config properties with our base properties. Here a new

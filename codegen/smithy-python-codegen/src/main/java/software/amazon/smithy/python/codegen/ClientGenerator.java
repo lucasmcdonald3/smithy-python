@@ -558,7 +558,7 @@ public class ClientGenerator implements Runnable {
         writer.dedent();
     }
 
-    private void initializeHttpAuthParameters(PythonWriter writer) {
+    protected void initializeHttpAuthParameters(PythonWriter writer) {
         var derived = new LinkedHashSet<DerivedProperty>();
         for (PythonIntegration integration : context.integrations()) {
             for (RuntimeClientPlugin plugin : integration.getClientPlugins()) {

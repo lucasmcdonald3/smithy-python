@@ -45,13 +45,14 @@ import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.traits.ErrorTrait;
 import software.amazon.smithy.model.traits.TimestampFormatTrait;
 import software.amazon.smithy.model.traits.TimestampFormatTrait.Format;
+import software.amazon.smithy.utils.CaseUtils;
 import software.amazon.smithy.utils.SetUtils;
 import software.amazon.smithy.utils.StringUtils;
 
 /**
  * Utility methods likely to be needed across packages.
  */
-public final class CodegenUtils {
+public class CodegenUtils {
 
     /**
      * The maximum preferred line length for generated code. In most cases it won't
@@ -75,8 +76,8 @@ public final class CodegenUtils {
     public static Symbol getConfigSymbol(PythonSettings settings) {
         return Symbol.builder()
                 .name("Config")
-                .namespace(format("%s.config", settings.getModuleName()), ".")
-                .definitionFile(format("./%s/config.py", settings.getModuleName()))
+                .namespace(format("%s.config", CaseUtils.toSnakeCase(settings.getService().getNamespace())), ".")
+                .definitionFile(format("./%s/config.py", CaseUtils.toSnakeCase(settings.getService().getNamespace())))
                 .build();
     }
 

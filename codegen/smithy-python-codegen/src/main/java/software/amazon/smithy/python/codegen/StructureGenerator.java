@@ -119,8 +119,8 @@ public class StructureGenerator implements Runnable {
         // TODO: Implement protocol-level customization of the error code
         var code = shape.getId().getName();
         var symbol = symbolProvider.toSymbol(shape);
-        var apiError = CodegenUtils.getApiError(settings);
-        writer.openBlock("class $L($T[Literal[$S]]):", "", symbol.getName(), apiError, code, () -> {
+//        var apiError = CodegenUtils.getApiError(settings);
+        writer.openBlock("class $L($L[Literal[$S]]):", "", symbol.getName(), "idgaf", code, () -> {
             writer.write("code: Literal[$1S] = $1S", code);
             writer.write("message: str");
             writeProperties(true);
@@ -327,7 +327,7 @@ public class StructureGenerator implements Runnable {
         });
     }
 
-    private void writeAsDict(boolean isError) {
+    protected void writeAsDict(boolean isError) {
         writer.openBlock("def as_dict(self) -> Dict[str, Any]:", "", () -> {
             writer.writeDocs(() -> {
                 writer.write("Converts the $L to a dictionary.\n", symbolProvider.toSymbol(shape).getName());
@@ -386,7 +386,7 @@ public class StructureGenerator implements Runnable {
         writer.write("");
     }
 
-    private void writeFromDict(boolean isError) {
+    protected void writeFromDict(boolean isError) {
         writer.write("@staticmethod");
         var shapeName = symbolProvider.toSymbol(shape).getName();
         writer.openBlock("def from_dict(d: Dict[str, Any]) -> $S:", "", shapeName, () -> {
@@ -449,7 +449,7 @@ public class StructureGenerator implements Runnable {
         writer.write("");
     }
 
-    private void writeRepr(boolean isError) {
+    protected void writeRepr(boolean isError) {
         var symbol = symbolProvider.toSymbol(shape);
         writer.write("""
             def __repr__(self) -> str:
@@ -484,7 +484,7 @@ public class StructureGenerator implements Runnable {
         }
     }
 
-    private void writeEq(boolean isError) {
+    protected void writeEq(boolean isError) {
         var symbol = symbolProvider.toSymbol(shape);
         writer.addStdlibImport("typing", "Any");
         var attributeList = new StringBuilder("[");
