@@ -283,7 +283,6 @@ public class DirectedPythonCodegen implements DirectedCodegen<GenerationContext,
      * Creates __init__.py files where not already present.
      */
     private void generateInits(CustomizeDirective<GenerationContext, PythonSettings> directive) {
-        System.out.println("inits" + directive.context().writerDelegator().getWriters().keySet());
         var directories = directive.context().writerDelegator().getWriters().keySet().stream()
                 .map(Paths::get)
                 .filter(path -> !path.getParent().equals(directive.fileManifest().getBaseDir()))

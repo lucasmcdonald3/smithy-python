@@ -115,7 +115,6 @@ public class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
 
     @Override
     public Symbol toSymbol(Shape shape) {
-//        System.out.println("tosymbol " + shape);
         Symbol symbol = shape.accept(this);
         LOGGER.fine(() -> format("Creating symbol from %s: %s", shape, symbol));
         return escaper.escapeSymbol(shape, symbol);
@@ -310,7 +309,6 @@ public class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
 
     @Override
     public Symbol resourceShape(ResourceShape shape) {
-//        System.out.println("symbolvisitor was passed resourceshape " + shape.getId());
         // TODO: implement resources
         return createStdlibSymbol(shape, "Any", "typing");
     }
@@ -374,8 +372,6 @@ public class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
 
     @Override
     public Symbol structureShape(StructureShape shape) {
-//        System.out.println("structureshape " + shape.getId());
-
         String name = getDefaultShapeName(shape);
         if (shape.hasTrait(ErrorTrait.class)) {
             return createSymbolBuilder(shape, name, format("%s.errors", settings.getModuleName()))
@@ -389,8 +385,6 @@ public class SymbolVisitor implements SymbolProvider, ShapeVisitor<Symbol> {
 
     @Override
     public Symbol unionShape(UnionShape shape) {
-//        System.out.println("2unionshape " + shape.getId());
-
         String name = getDefaultShapeName(shape);
 
         var unknownName = name + "Unknown";

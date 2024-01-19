@@ -45,14 +45,13 @@ import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.traits.ErrorTrait;
 import software.amazon.smithy.model.traits.TimestampFormatTrait;
 import software.amazon.smithy.model.traits.TimestampFormatTrait.Format;
-import software.amazon.smithy.utils.CaseUtils;
 import software.amazon.smithy.utils.SetUtils;
 import software.amazon.smithy.utils.StringUtils;
 
 /**
  * Utility methods likely to be needed across packages.
  */
-public class CodegenUtils {
+public final class CodegenUtils {
 
     /**
      * The maximum preferred line length for generated code. In most cases it won't
@@ -76,8 +75,8 @@ public class CodegenUtils {
     public static Symbol getConfigSymbol(PythonSettings settings) {
         return Symbol.builder()
                 .name("Config")
-                .namespace(format("%s.config", CaseUtils.toSnakeCase(settings.getService().getNamespace())), ".")
-                .definitionFile(format("./%s/config.py", CaseUtils.toSnakeCase(settings.getService().getNamespace())))
+                .namespace(format("%s.config", settings.getModuleName()), ".")
+                .definitionFile(format("./%s/config.py", settings.getModuleName()))
                 .build();
     }
 
@@ -181,7 +180,7 @@ public class CodegenUtils {
      * @param shape The member to check.
      * @return Returns whether the member is probably the error message.
      */
-    static boolean isErrorMessage(Model model, MemberShape shape) {
+    public static boolean isErrorMessage(Model model, MemberShape shape) {
         return ERROR_MESSAGE_MEMBER_NAMES.contains(shape.getMemberName().toLowerCase(Locale.US))
                 && model.expectShape(shape.getContainer()).hasTrait(ErrorTrait.class);
     }
