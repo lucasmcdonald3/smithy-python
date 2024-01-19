@@ -79,8 +79,8 @@ public interface ProtocolGenerator {
     default Symbol getSerializationFunction(GenerationContext context, ToShapeId shapeId) {
         return Symbol.builder()
                 .name(getSerializationFunctionName(context, shapeId))
-                .namespace(format("%s.deserialize", context.settings().getModuleName()), "")
-                .definitionFile(format("./%s/deserialize.py", context.settings().getModuleName()))
+                .namespace(format("%s.serialize", context.settings().getModuleName()), "")
+                .definitionFile(format("./%s/serialize.py", context.settings().getModuleName()))
                 .build();
     }
 
@@ -123,8 +123,8 @@ public interface ProtocolGenerator {
         var name = context.settings().getService(context.model()).getContextualName(shapeId);
         return Symbol.builder()
             .name("_deserialize_error_" + CaseUtils.toSnakeCase(name))
-            .namespace(format("%s.serialize", context.settings().getModuleName()), "")
-            .definitionFile(format("./%s/serialize.py", context.settings().getModuleName()))
+            .namespace(format("%s.deserialize", context.settings().getModuleName()), "")
+            .definitionFile(format("./%s/deserialize.py", context.settings().getModuleName()))
             .build();
     }
 
