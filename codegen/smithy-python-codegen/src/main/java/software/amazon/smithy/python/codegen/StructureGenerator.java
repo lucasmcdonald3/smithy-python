@@ -34,11 +34,7 @@ import software.amazon.smithy.model.node.Node;
 import software.amazon.smithy.model.shapes.MemberShape;
 import software.amazon.smithy.model.shapes.Shape;
 import software.amazon.smithy.model.shapes.StructureShape;
-import software.amazon.smithy.model.traits.DefaultTrait;
-import software.amazon.smithy.model.traits.DocumentationTrait;
-import software.amazon.smithy.model.traits.ErrorTrait;
-import software.amazon.smithy.model.traits.RequiredTrait;
-import software.amazon.smithy.model.traits.SensitiveTrait;
+import software.amazon.smithy.model.traits.*;
 
 
 /**
@@ -189,14 +185,22 @@ public class StructureGenerator implements Runnable {
         Stream.concat(requiredMembers.stream(), optionalMembers.stream()).forEach(member -> {
             String memberName = symbolProvider.toMemberName(member);
             if (isOptionalDefault(member)) {
-                writer.write("self.$1L = $1L if $1L is not None else $2L",
-                    memberName, getDefaultValue(writer, member));
+                writeInitMethodAssignerForOptionalMember(member, memberName);
             } else {
-                writer.write("self.$1L = $1L", memberName);
+                writeInitMethodAssignerForRequiredMember(member, memberName);
             }
         });
         writer.dedent();
         writer.write("");
+    }
+
+    protected void writeInitMethodAssignerForOptionalMember(MemberShape member, String memberName) {
+        writer.write("self.$1L = $1L if $1L is not None else $2L",
+                memberName, getDefaultValue(writer, member));
+    }
+
+    protected void writeInitMethodAssignerForRequiredMember(MemberShape member, String memberName) {
+        writer.write("self.$1L = $1L", memberName);
     }
 
     protected void writeInitMethodParameterForRequiredMember(boolean isError, MemberShape member) {
@@ -288,7 +292,7 @@ public class StructureGenerator implements Runnable {
         return "$T";
     }
 
-    private String getDefaultValue(PythonWriter writer, MemberShape member) {
+    protected String getDefaultValue(PythonWriter writer, MemberShape member) {
         // The default value is defined in the model is a exposed as generic
         // json, so we need to convert it to the proper type based on the target.
         // see: https://smithy.io/2.0/spec/type-refinement-traits.html#smithy-api-default-trait
