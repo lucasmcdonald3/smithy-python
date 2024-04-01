@@ -463,7 +463,7 @@ public class StructureGenerator implements Runnable {
             """, symbol.getName(), (Runnable) () -> writeReprMembers(isError));
     }
 
-    private void writeReprMembers(boolean isError) {
+    protected void writeReprMembers(boolean isError) {
         if (isError) {
             writer.write("result += f'message={self.message},'");
         }
