@@ -56,7 +56,7 @@ import software.amazon.smithy.python.codegen.integration.PythonIntegration;
 import software.amazon.smithy.utils.SmithyUnstableApi;
 
 @SmithyUnstableApi
-final class DirectedPythonCodegen implements DirectedCodegen<GenerationContext, PythonSettings, PythonIntegration> {
+public class DirectedPythonCodegen implements DirectedCodegen<GenerationContext, PythonSettings, PythonIntegration> {
 
     private static final Logger LOGGER = Logger.getLogger(DirectedPythonCodegen.class.getName());
 
@@ -135,7 +135,7 @@ final class DirectedPythonCodegen implements DirectedCodegen<GenerationContext, 
         protocolGenerator.generateProtocolTests(directive.context());
     }
 
-    private void generateServiceErrors(PythonSettings settings, WriterDelegator<PythonWriter> writers) {
+    protected void generateServiceErrors(PythonSettings settings, WriterDelegator<PythonWriter> writers) {
         var serviceError = CodegenUtils.getServiceError(settings);
         writers.useFileWriter(serviceError.getDefinitionFile(), serviceError.getNamespace(), writer -> {
             // TODO: subclass a shared error
